@@ -3,14 +3,19 @@ local SelectorRuntime = require("scripts.selector_runtime")
 
 local SelectorGui = {}
 
+---@generic K : string|number
+---@generic V : any
+---@param tab table<K, V>
+---@param element V
+---@return K?
 local function find(tab, element)
-    for index, value in pairs(tab) do
+    for key, value in pairs(tab) do
         if value == element then
-            return index
+            return key
         end
     end
 
-    return false
+    return nil
 end
 
 local function write_text_boxes(entry, gui)
@@ -93,6 +98,8 @@ local function find_selector_entry_by_gui_element(gui)
     return global.selector_combinators[selector_id]
 end
 
+---@param player LuaPlayer
+---@param entity LuaEntity
 function SelectorGui.on_gui_added(player, entity)
     local screen = player.gui.screen
 
@@ -534,6 +541,7 @@ function SelectorGui.bind_all_events()
 
         local options_flow = gui.inner_frame.options_flow
 
+        ---@type table<SelectorMode, LuaGuiElement>
         local radio_buttons = {
             select_index = options_flow.select_index_button_flow.select_index_button,
             count_inputs = options_flow.count_inputs_button_flow.count_inputs_button,
@@ -579,6 +587,8 @@ function SelectorGui.bind_all_events()
             SelectorAppearance.update_combinator_appearance(selector_entry)
         end
 
+        selector_entry.settings.mode = selected_mode
+        SelectorAppearance.update_combinator_appearance(selector_entry)
         SelectorRuntime.clear_caches_and_force_update(selector_entry)
     end)
 

@@ -3,6 +3,7 @@ local util = require("__core__/lualib/util")
 local SelectorAppearance = require("scripts.selector_appearance")
 local SelectorGui = require("scripts.selector_gui")
 local SelectorRuntime = require("scripts.selector_runtime")
+local api = require("scripts.api")
 
 script.on_init(function()
     SelectorRuntime.init()
@@ -126,6 +127,7 @@ SelectorGui.bind_all_events()
 -- Added Events
 script.on_event(defines.events.on_built_entity, on_added, { selector_filter })
 script.on_event(defines.events.on_robot_built_entity, on_added, { selector_filter })
+script.on_event(defines.events.script_raised_built, on_added, { selector_filter })
 
 -- Paste events
 script.on_event(defines.events.on_entity_settings_pasted, on_entity_settings_pasted)

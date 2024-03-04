@@ -48,10 +48,19 @@ function SelectorRuntime.find_selector_entry_by_unit_number(unit_number)
     return global.selector_combinators[unit_number]
 end
 
----@param event EventData.on_built_entity | EventData.on_robot_built_entity
+---@param event EventData.on_built_entity | EventData.on_robot_built_entity | EventData.script_raised_built
 function SelectorRuntime.add_combinator(event)
-    local entity = event.created_entity
+    local tags = event.tags and event.tags[Constants.combinator_name]
+    if not tags or type(tags) ~= "table" then
+        tags = nil
+    end
 
+    return SelectorRuntime.create_combinator(event.created_entity or event.entity, tags)
+end
+
+---@param entity LuaEntity
+---@param tags table?
+function SelectorRuntime.create_combinator(entity, tags)
     -- Register the entity for the destruction event.
     script.register_on_entity_destroyed(entity)
 
@@ -112,9 +121,8 @@ function SelectorRuntime.add_combinator(event)
         cache = nil,
     }
 
-    local tags = event.tags and event.tags[Constants.combinator_name] or nil
-    if (type(tags) == "table") then
-        selector.settings = util.table.deepcopy(tags)
+    if tags then
+        selector.settings = util.table.deepcopy(tags[Constants.combinator_name])
     end
 
     global.selector_combinators[entity.unit_number] = selector
@@ -124,6 +132,8 @@ function SelectorRuntime.add_combinator(event)
 
     -- Get this selector into its running state
     SelectorRuntime.clear_caches_and_force_update(selector)
+
+    return true
 end
 
 function SelectorRuntime.remove_combinator(unit_number)
