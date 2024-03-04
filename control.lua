@@ -160,3 +160,5 @@ script.on_event(defines.events.on_tick, function()
         selector:on_tick()
     end
 end)
+
+require("tests.entry")
